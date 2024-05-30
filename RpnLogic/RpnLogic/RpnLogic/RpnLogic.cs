@@ -21,6 +21,26 @@ namespace RpnLogic
             double result = RpnLogic.EvaluateRPN(rpn);
             return result;
         }
+
+        public double CalculateWithVariable(string expression, double xValue)
+        {
+            List<Token> tokens = RpnLogic.Tokenize(expression);
+            ReplaceVariableTokens(tokens, xValue);
+            Queue<Token> rpn = RpnLogic.ConvertToRPN(tokens);
+            double result = RpnLogic.EvaluateRPN(rpn);
+            return result;
+        }
+
+        private void ReplaceVariableTokens(List<Token> tokens, double xValue)
+        {
+            for (int i = 0; i < tokens.Count; i++)
+            {
+                if (tokens[i] is Variable)
+                {
+                    tokens[i] = new Number(xValue);
+                }
+            }
+        }
     }
     internal class RpnLogic
     {
@@ -42,8 +62,9 @@ namespace RpnLogic
         //Если число, то он добавляет его в список токенов типа Number. 
         //Если это операция или скобка, то он добавляет их в список токенов типа Operation или Parenthesis.
         {
-            List<Token> tokens = new List<Token>(); //создаю пустой список токенов.
+            List<Token> tokens = new List<Token>();
             string currentNumber = "";
+            string currentVariable = "";
 
             foreach (char c in expression)
             {
@@ -51,13 +72,22 @@ namespace RpnLogic
                 {
                     currentNumber += c;
                 }
+                else if (char.IsLetter(c) && c.ToString().ToLower() == "x")
+                {
+                    currentVariable += c;
+                }
                 else
                 {
-                    if (!string.IsNullOrEmpty(currentNumber)) //проверяю, является ли текущее число пустым или же относится к null.
+                    if (!string.IsNullOrEmpty(currentNumber))
                     {
                         double number = double.Parse(currentNumber);
                         tokens.Add(new Number(number));
                         currentNumber = "";
+                    }
+                    else if (!string.IsNullOrEmpty(currentVariable))
+                    {
+                        tokens.Add(new Variable(currentVariable));
+                        currentVariable = "";
                     }
 
                     if (c == '(' || c == ')')
@@ -76,9 +106,14 @@ namespace RpnLogic
                 double number = double.Parse(currentNumber);
                 tokens.Add(new Number(number));
             }
+            else if (!string.IsNullOrEmpty(currentVariable))
+            {
+                tokens.Add(new Variable(currentVariable));
+            }
 
-            return tokens; // возвращаю список токенов.
+            return tokens;
         }
+
 
         public static Queue<Token> ConvertToRPN(List<Token> tokens)
         //Здесь просто преобразую список токенов в ОПЗ и возвращает очередь токенов.
@@ -235,6 +270,14 @@ namespace RpnLogic
     internal class Parenthesis : Token
     {
         public Parenthesis(string value)
+        {
+            Value = value;
+        }
+    }
+
+    internal class Variable : Token
+    {
+        public Variable(string value)
         {
             Value = value;
         }

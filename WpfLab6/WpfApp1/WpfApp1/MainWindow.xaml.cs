@@ -28,9 +28,17 @@ namespace WpfApp1
         private void btnCalculate_Click(object sender, RoutedEventArgs e)
         {
             string expression = tbInput.Text.Replace(" ", string.Empty);
-            RpnCalculator calculator = new RpnCalculator();
-            double result = calculator.CalculateExpression(expression);
-            lblOutput.Content = result.ToString();
+            double xValue;
+            if (double.TryParse(tbXValue.Text, out xValue))
+            {
+                RpnCalculator calculator = new RpnCalculator();
+                double result = calculator.CalculateWithVariable(expression, xValue);
+                lblOutput.Content = result.ToString();
+            }
+            else
+            {
+                lblOutput.Content = "Неверное значение для x";
+            }
         }
     }
 }
