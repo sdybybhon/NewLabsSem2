@@ -14,14 +14,6 @@ namespace RpnLogic
 {
     public class RpnCalculator
     {
-        public double CalculateExpression(string expression)
-        {
-            List<Token> tokens = RpnLogic.Tokenize(expression);
-            Queue<Token> rpn = RpnLogic.ConvertToRPN(tokens);
-            double result = RpnLogic.EvaluateRPN(rpn);
-            return result;
-        }
-
         public double CalculateWithVariable(string expression, double xValue)
         {
             List<Token> tokens = RpnLogic.Tokenize(expression);
@@ -31,7 +23,7 @@ namespace RpnLogic
             return result;
         }
 
-        private void ReplaceVariableTokens(List<Token> tokens, double xValue)
+        private static void ReplaceVariableTokens(List<Token> tokens, double xValue)
         {
             for (int i = 0; i < tokens.Count; i++)
             {
@@ -44,17 +36,6 @@ namespace RpnLogic
     }
     internal class RpnLogic
     {
-        static void Main(string[] args)
-        {
-            Console.WriteLine("Введите выражение:");
-            string expression = Console.ReadLine();
-
-            List<Token> tokens = Tokenize(expression);
-            Queue<Token> rpn = ConvertToRPN(tokens);
-
-            double result = EvaluateRPN(rpn);
-            Console.WriteLine("Результат: " + result);
-        }
 
         public static List<Token> Tokenize(string expression)
         //Этим методом разбиваю выражение на токены и возвращаю список токенов.
