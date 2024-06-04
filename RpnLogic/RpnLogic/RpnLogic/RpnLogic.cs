@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Authentication.ExtendedProtection;
@@ -43,31 +44,35 @@ namespace RpnLogic
         //Если это операция или скобка, то он добавляет их в список токенов типа Operation или Parenthesis.
         {
             List<Token> tokens = new List<Token>();
-            string currentNumber = "";
-            string currentVariable = "";
+            StringBuilder currentNumber = new StringBuilder();
+            bool decimalSeparatorFound = false;
 
             foreach (char c in expression)
             {
-                if (char.IsDigit(c) || c == '.')
+                if (char.IsDigit(c))
                 {
-                    currentNumber += c;
+                    currentNumber.Append(c);
                 }
-                else if (char.IsLetter(c) && c.ToString().ToLower() == "x")
+                else if (c == ',' || c == '.')
                 {
-                    currentVariable += c;
+                    if (!decimalSeparatorFound)
+                    {
+                        currentNumber.Append('.');
+                        decimalSeparatorFound = true;
+                    }
+                    else
+                    {
+                        throw new FormatException("Неправильный формат числа");
+                    }
                 }
                 else
                 {
-                    if (!string.IsNullOrEmpty(currentNumber))
+                    if (currentNumber.Length > 0)
                     {
-                        double number = double.Parse(currentNumber);
+                        double number = double.Parse(currentNumber.ToString(), CultureInfo.InvariantCulture);
                         tokens.Add(new Number(number));
-                        currentNumber = "";
-                    }
-                    else if (!string.IsNullOrEmpty(currentVariable))
-                    {
-                        tokens.Add(new Variable(currentVariable));
-                        currentVariable = "";
+                        currentNumber.Clear();
+                        decimalSeparatorFound = false;
                     }
 
                     if (c == '(' || c == ')')
@@ -78,17 +83,17 @@ namespace RpnLogic
                     {
                         tokens.Add(new Operation(c.ToString(), GetPriority(c.ToString())));
                     }
+                    else if (char.IsLetter(c) && c.ToString().ToLower() == "x")
+                    {
+                        tokens.Add(new Variable(c.ToString()));
+                    }
                 }
             }
 
-            if (!string.IsNullOrEmpty(currentNumber))
+            if (currentNumber.Length > 0)
             {
-                double number = double.Parse(currentNumber);
+                double number = double.Parse(currentNumber.ToString().Replace(",", "."));
                 tokens.Add(new Number(number));
-            }
-            else if (!string.IsNullOrEmpty(currentVariable))
-            {
-                tokens.Add(new Variable(currentVariable));
             }
 
             return tokens;
