@@ -36,7 +36,6 @@ namespace RpnLogic
     }
     internal class RpnLogic
     {
-
         public static List<Token> Tokenize(string expression)
         //Этим методом разбиваю выражение на токены и возвращаю список токенов.
         //Прохожу по каждому символу в выражении и определяет, является ли символ числом, операцией или скобкой.

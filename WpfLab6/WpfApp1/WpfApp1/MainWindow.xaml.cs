@@ -1,44 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 using RpnLogic;
 
 namespace WpfApp1
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
+        private CanvasRenderer _canvasRenderer;
+        private Canvas _canvasGraph;
+
         public MainWindow()
         {
             InitializeComponent();
+            _canvasGraph = CanvasGraph;
+            _canvasRenderer = new CanvasRenderer(_canvasGraph);
         }
-        private void btnCalculate_Click(object sender, RoutedEventArgs e)
+
+        private void Button_Click(object sender, RoutedEventArgs e)
         {
-            string expression = tbInput.Text.Replace(" ", string.Empty);
-            double xValue;
-            if (double.TryParse(tbXValue.Text, out xValue))
-            {
-                RpnCalculator calculator = new RpnCalculator();
-                double result = calculator.CalculateWithVariable(expression, xValue);
-                lblOutput.Content = result.ToString();
-            }
-            else
-            {
-                lblOutput.Content = "Неверное значение для x";
-            }
+            string expression = txtboxInput.Text;
+            double start = double.Parse(txtboxStart.Text);
+            double end = double.Parse(txtboxEnd.Text);
+            double scale = double.Parse(txtboxScale.Text);
+            double step = double.Parse(txtboxStep.Text);
+
+            _canvasRenderer.DrawFunctionGraph(expression, start, end, scale, step);
         }
     }
 }
