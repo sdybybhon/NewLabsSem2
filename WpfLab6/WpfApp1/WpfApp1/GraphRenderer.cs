@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using RpnLogic;
 
 namespace WpfApp1
@@ -14,11 +15,17 @@ namespace WpfApp1
         private Ellipse _selectedPoint;
         private TextBlock _coordinateText;
         private List<(double x, double y, double canvasX, double canvasY)> _graphPoints;
+        private DispatcherTimer _coordinateTextTimer;
+        private bool _isCoordinateTextVisible;
 
         public CanvasRenderer(Canvas canvasGraph)
         {
             _canvasGraph = canvasGraph;
             _graphPoints = new List<(double, double, double, double)>();
+            _coordinateTextTimer = new DispatcherTimer();
+            _coordinateTextTimer.Interval = TimeSpan.FromSeconds(0.5);
+            _coordinateTextTimer.Tick += CoordinateTextTimer_Tick;
+            _isCoordinateTextVisible = false;
         }
 
 
@@ -143,7 +150,6 @@ namespace WpfApp1
         }
 
         private void GraphPoint_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
-        //Вместе с GraphPoint_MouseLeave отвечает за показ координат при наведении на точку
         {
             Ellipse point = sender as Ellipse;
             if (point != null)
@@ -169,6 +175,8 @@ namespace WpfApp1
                 _coordinateText.Text = $"x: {x:F2}, y: {y:F2}";
                 Canvas.SetLeft(_coordinateText, pointInfo.canvasX - point.Width / 2);
                 Canvas.SetTop(_coordinateText, pointInfo.canvasY - point.Height / 2 - 20);
+                _isCoordinateTextVisible = true;
+                _coordinateTextTimer.Start();
             }
         }
 
@@ -176,10 +184,25 @@ namespace WpfApp1
         {
             if (_selectedPoint != null)
             {
+                if (_isCoordinateTextVisible)
+                {
+                    _coordinateTextTimer.Start();
+                }
+                else
+                {
+                    _canvasGraph.Children.Remove(_coordinateText);
+                    _coordinateText = null;
+                }
                 _selectedPoint = null;
-                _canvasGraph.Children.Remove(_coordinateText);
-                _coordinateText = null;
             }
         }
+        private void CoordinateTextTimer_Tick(object sender, EventArgs e)
+        {
+            _coordinateTextTimer.Stop();
+            _isCoordinateTextVisible = false;
+            _canvasGraph.Children.Remove(_coordinateText);
+            _coordinateText = null;
+        }
+
     }
 }
