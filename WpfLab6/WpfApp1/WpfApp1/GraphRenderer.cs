@@ -23,7 +23,7 @@ namespace WpfApp1
             _canvasGraph = canvasGraph;
             _graphPoints = new List<(double, double, double, double)>();
             _coordinateTextTimer = new DispatcherTimer();
-            _coordinateTextTimer.Interval = TimeSpan.FromSeconds(0.5);
+            _coordinateTextTimer.Interval = TimeSpan.FromSeconds(0.6);
             _coordinateTextTimer.Tick += CoordinateTextTimer_Tick;
             _isCoordinateTextVisible = false;
         }

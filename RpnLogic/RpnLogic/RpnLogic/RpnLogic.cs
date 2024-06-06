@@ -72,7 +72,7 @@ namespace RpnLogic
 
         public override double Perform(params double[] operands)
         {
-            return operands[0] - operands[1];
+            return operands[1] - operands[0];
         }
     }
 
@@ -96,7 +96,7 @@ namespace RpnLogic
 
         public override double Perform(params double[] operands)
         {
-            return operands[0] / operands[1];
+            return operands[1] / operands[0];
         }
     }
 
